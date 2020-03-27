@@ -245,25 +245,38 @@ func WriteFile(box *packr.Box, name, pkg string, openrpc *types.OpenRPCSpec1) er
 		return fmt.Errorf("template.Execute error: err=%v", err)
 	}
 
-	fset := new(token.FileSet)
-	root, err := parser.ParseFile(fset, "", tmpl.Bytes(), parser.ParseComments)
+	if len(tmpl.Bytes()) == 0 {
+		return fmt.Errorf("empty template parsed")
+	} else {
+		//fmt.Println(string(tmpl.Bytes()))
+		//ioutil.WriteFile("/tmp/template.go", tmpl.Bytes(), os.ModePerm)
+		fmt.Println("box.Path=", box.Path, "name=", name, "pkg=", pkg)
+	}
+	err = ioutil.WriteFile(path.Join(pkg, fmt.Sprintf(`%s.%s`, name, goExt)), tmpl.Bytes(), os.ModePerm)
 	if err != nil {
 		return err
 	}
-	ast.SortImports(fset, root)
-	cfg := printer.Config{Mode: printer.UseSpaces | printer.TabIndent, Tabwidth: 8}
-
-	root.Name.Name = path.Base(pkg)
-
-	err = os.MkdirAll(pkg, os.ModePerm)
-	if err != nil {
-		return err
-	}
-	file, err := os.OpenFile(path.Join(pkg, fmt.Sprintf("%s.%s", name, goExt)), os.O_RDWR|os.O_CREATE, 0644)
-	if err != nil {
-		return err
-	}
-	defer file.Close()
-
-	return cfg.Fprint(file, fset, root)
+	return nil
+	//fset := new(token.FileSet)
+	////root, err := parser.ParseFile(fset, "", tmpl.Bytes(), parser.ParseComments)
+	//root, err := parser.ParseFile(fset, "", tmpl.Bytes(), parser.ParseComments|parser.AllErrors)
+	//if err != nil {
+	//	return fmt.Errorf("parser.ParseFile error: err=%v", err)
+	//}
+	//ast.SortImports(fset, root)
+	//cfg := printer.Config{Mode: printer.UseSpaces | printer.TabIndent, Tabwidth: 8}
+	//
+	//root.Name.Name = path.Base(pkg)
+	//
+	//err = os.MkdirAll(pkg, os.ModePerm)
+	//if err != nil {
+	//	return err
+	//}
+	//file, err := os.OpenFile(path.Join(pkg, fmt.Sprintf("%s.%s", name, goExt)), os.O_RDWR|os.O_CREATE, 0644)
+	//if err != nil {
+	//	return err
+	//}
+	//defer file.Close()
+	//
+	//return cfg.Fprint(file, fset, root)
 }
