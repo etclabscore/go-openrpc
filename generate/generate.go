@@ -160,14 +160,16 @@ func maybeMethodResult(method types.Method) string {
 
 func maybeMethodComment(method types.Method) string {
 	if comment := util.FirstOf(method.Description, method.Summary); comment != "" {
-		return fmt.Sprintf("// %s", comment)
+		return fmt.Sprintf(`/* %s */`, comment)
 	}
 	return ""
 }
 
 func maybeFieldComment(desc string) string {
 	if desc != "" {
-		return fmt.Sprintf("// %s", desc)
+		return fmt.Sprintf(`/*
+%s
+*/`, desc)
 	}
 	return ""
 }
