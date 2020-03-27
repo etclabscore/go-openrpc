@@ -4,10 +4,7 @@ import (
 	"bytes"
 	"encoding/json"
 	"fmt"
-	"go/ast"
-	"go/parser"
-	"go/printer"
-	"go/token"
+	"io/ioutil"
 	"os"
 	"path"
 	"path/filepath"
@@ -223,20 +220,29 @@ func funcMap(openrpc *types.OpenRPCSpec1) template.FuncMap {
 }
 
 func WriteFile(box *packr.Box, name, pkg string, openrpc *types.OpenRPCSpec1) error {
+	if name == "" {
+		return fmt.Errorf("WriteFile: empty file name")
+	}
+	if openrpc == nil {
+		return fmt.Errorf("WriteFile: empty openrpc")
+	}
 	data, err := box.Find(fmt.Sprintf("%s.%s", name, goTmplExt))
 	if err != nil {
-		return err
+		return fmt.Errorf("box.Find error: err=%v", err)
 	}
 
+	if len(data) == 0 {
+		return fmt.Errorf("WriteFile: no data")
+	}
 	tmp, err := template.New(name).Funcs(funcMap(openrpc)).Parse(string(data))
 	if err != nil {
-		return err
+		return fmt.Errorf("template.New error: err=%v", err)
 	}
 
 	tmpl := new(bytes.Buffer)
 	err = tmp.Execute(tmpl, openrpc)
 	if err != nil {
-		return err
+		return fmt.Errorf("template.Execute error: err=%v", err)
 	}
 
 	fset := new(token.FileSet)
