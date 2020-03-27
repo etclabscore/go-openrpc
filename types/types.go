@@ -33,11 +33,11 @@ type ServerVariable struct {
 }
 
 type Server struct {
-	Name        string                    `json:"name"`
-	URL         string                    `json:"url"`
-	Summary     string                    `json:"summary"`
-	Description string                    `json:"description"`
-	Variables   map[string]ServerVariable `json:"variables"`
+	Name        string                    `json:"name,omitempty"`
+	URL         string                    `json:"url,omitempty"`
+	Summary     string                    `json:"summary,omitempty"`
+	Description string                    `json:"description,omitempty"`
+	Variables   map[string]ServerVariable `json:"variables,omitempty"`
 }
 
 type ExternalDocs struct {
@@ -49,7 +49,7 @@ type Tag struct {
 	Name         string       `json:"name"`
 	Summary      string       `json:"summary"`
 	Description  string       `json:"description"`
-	ExternalDocs ExternalDocs `json:"externalDocs"`
+	ExternalDocs ExternalDocs `json:"externalDocs,omitempty"`
 }
 
 type Content struct {
@@ -141,13 +141,13 @@ type Method struct {
 }
 
 type Components struct {
-	ContentDescriptors    map[string]*ContentDescriptor `json:"contentDescriptors"`
-	Schemas               map[string]spec.Schema        `json:"schemas"`
-	Examples              map[string]Example            `json:"examples"`
-	Links                 map[string]Link               `json:"links"`
-	Errors                map[string]Error              `json:"errors"`
-	ExamplePairingObjects map[string]ExamplePairing     `json:"examplePairingObjects"`
-	Tags                  map[string]Tag                `json:"tags"`
+	ContentDescriptors    map[string]*ContentDescriptor `json:"contentDescriptors,omitempty"`
+	Schemas               map[string]spec.Schema        `json:"schemas,omitempty"`
+	Examples              map[string]Example            `json:"examples,omitempty"`
+	Links                 map[string]Link               `json:"links,omitempty"`
+	Errors                map[string]Error              `json:"errors,omitempty"`
+	ExamplePairingObjects map[string]ExamplePairing     `json:"examplePairingObjects,omitempty"`
+	Tags                  map[string]Tag                `json:"tags,omitempty"`
 }
 
 type OpenRPCSpec1 struct {
@@ -156,7 +156,7 @@ type OpenRPCSpec1 struct {
 	Servers      []Server     `json:"servers"`
 	Methods      []Method     `json:"methods"`
 	Components   Components   `json:"components"`
-	ExternalDocs ExternalDocs `json:"externalDocs"`
+	ExternalDocs ExternalDocs `json:"externalDocs,omitempty"`
 
 	Objects *ObjectMap `json:"-"`
 }
