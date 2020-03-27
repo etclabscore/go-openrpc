@@ -4,6 +4,7 @@ import (
 	"fmt"
 	"path"
 	"reflect"
+	"strings"
 
 	"github.com/go-openapi/spec"
 	"github.com/gregdhill/go-openrpc/types"
@@ -30,6 +31,8 @@ func persistFields(prev, next spec.Schema) spec.Schema {
 	return next
 }
 
+var ress = map[string]uint{}
+
 func resolveSchema(openrpc *types.OpenRPCSpec1, sch spec.Schema) spec.Schema {
 	doc, _, _ := sch.Ref.GetPointer().Get(openrpc)
 
@@ -39,6 +42,26 @@ func resolveSchema(openrpc *types.OpenRPCSpec1, sch spec.Schema) spec.Schema {
 		sch = persistFields(sch, cd.Schema)
 	}
 
+	key := fmt.Sprintf("%s%s", sch.ID, strings.Join(sch.Type, "+"))
+	if _, ok := ress[key]; ok {
+		ress[key] = ress[key] + 1
+	} else {
+		ress[key] = 1
+	}
+	if ress[key] > 10 {
+		return sch
+		//return spec.Schema{
+		//	VendorExtensible: spec.VendorExtensible{},
+		//	SchemaProps: spec.SchemaProps{
+		//		ID:   sch.ID,
+		//		Type: sch.Type,
+		//		Description: "FIXABLE",
+		//
+		//	},
+		//	SwaggerSchemaProps: spec.SwaggerSchemaProps{},
+		//	ExtraProps:         nil,
+		//}
+	}
 	if sch.Ref.GetURL() != nil {
 		return resolveSchema(openrpc, sch)
 	}
