@@ -50,17 +50,6 @@ func resolveSchema(openrpc *types.OpenRPCSpec1, sch spec.Schema) spec.Schema {
 	}
 	if ress[key] > 10 {
 		return sch
-		//return spec.Schema{
-		//	VendorExtensible: spec.VendorExtensible{},
-		//	SchemaProps: spec.SchemaProps{
-		//		ID:   sch.ID,
-		//		Type: sch.Type,
-		//		Description: "FIXABLE",
-		//
-		//	},
-		//	SwaggerSchemaProps: spec.SwaggerSchemaProps{},
-		//	ExtraProps:         nil,
-		//}
 	}
 	if sch.Ref.GetURL() != nil {
 		return resolveSchema(openrpc, sch)
@@ -91,7 +80,14 @@ func dereference(openrpc *types.OpenRPCSpec1, name string, sch spec.Schema, om *
 	// resolve all pointers
 	sch = resolveSchema(openrpc, sch)
 
-	if len(sch.Properties) > 0 {
+	if len(sch.Definitions) > 0 {
+		for k, v := range sch.Definitions {
+			v.Title = k
+			dereference(openrpc, v.Title, v, om)
+		}
+		om.Set(name, types.BasicType{sch.Description, sch.Title, getObjectType(openrpc, resolveSchema(openrpc, sch))})
+		return
+	} else if len(sch.Properties) > 0 {
 		for key, value := range sch.Properties {
 			value.Title = key
 			dereference(openrpc, sch.Title, value, om)
