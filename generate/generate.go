@@ -58,13 +58,13 @@ func maybeLookupComponentsContentDescriptor(cmpnts *types.Components, cd *types.
 	return
 }
 
-func schemaHazRef(sch spec.Schema) bool {
+func schemaHasRef(sch spec.Schema) bool {
 	return sch.Ref.String() != ""
 }
 
 func derefSchemaRecurse(cts *types.Components, sch spec.Schema) spec.Schema {
-	if schemaHazRef(sch) {
-		sch = getSchemaFromRef(cts, sch.Ref)
+	if schemaHasRef(sch) {
+		sch = getComponentsSchemaFromRef(cts, sch.Ref)
 		sch = derefSchemaRecurse(cts, sch)
 	}
 	for i := range sch.OneOf {
@@ -132,7 +132,7 @@ func derefSchemaRecurse(cts *types.Components, sch spec.Schema) spec.Schema {
 	return sch
 }
 
-func getSchemaFromRef(cmpnts *types.Components, ref spec.Ref) (sch spec.Schema) {
+func getComponentsSchemaFromRef(cmpnts *types.Components, ref spec.Ref) (sch spec.Schema) {
 	if cmpnts == nil || ref.String() == "" {
 		return
 	}
@@ -184,7 +184,7 @@ func funcMap(openrpc *types.OpenRPCSpec1) template.FuncMap {
 	return template.FuncMap{
 		"programName":             getProgramName,
 		"derefSchema":             derefSchemaRecurse,
-		"schemaHasRef":            schemaHazRef,
+		"schemaHasRef":            schemaHasRef,
 		"schemaAsJSONPretty":      schemaAsJSONPretty,
 		"lookupContentDescriptor": maybeLookupComponentsContentDescriptor,
 		"sanitizeBackticks":       util.SanitizeBackticks,
